@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Nghe và Viết Chính Tả: My First Sentences</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #ec407a; /* Hồng */
+            --primary-dark: #c2185b;
+            --success-color: #4caf50;
+            --error-color: #f44336;
+            --light-bg: #fce4ec;
+            --text-color: #333;
+            --white-color: #ffffff;
+            --yellow-color: #ffc107;
+            /* Màu cho các nút chủ đề */
+            --topic-color-1: #ef5350; /* Đỏ nhạt */
+            --topic-color-2: #42a5f5; /* Xanh dương */
+            --topic-color-3: #66bb6a; /* Xanh lá */
+            --topic-color-4: #ffa726; /* Cam */
+            --topic-color-5: #ab47bc; /* Tím */
+        }
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: linear-gradient(120deg, #f8bbd0 0%, #ce93d8 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            color: var(--text-color);
+            overscroll-behavior: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .container {
+            text-align: center;
+            padding: 25px;
+            max-width: 900px;
+            width: 95%;
+            background: var(--white-color);
+            border-radius: 24px;
+            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.1), 0 4px 15px rgba(0, 0, 0, 0.05);
+            box-sizing: border-box;
+        }
+        .game-title {
+            font-size: clamp(1.8em, 5vw, 2.5em);
+            color: var(--primary-color);
+            margin: 0 0 5px;
+            font-weight: 700;
+        }
+        .game-subtitle {
+            font-size: clamp(1.2em, 4vw, 1.5em);
+            margin-bottom: 20px;
+            color: #555;
+            font-weight: 600;
+        }
+        .meaning {
+            font-size: clamp(1.1em, 4.5vw, 1.6em);
+            color: var(--primary-dark);
+            margin: 15px 0;
+            font-style: italic;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .input-container {
+            position: relative;
+            margin: 30px 0;
+        }
+        #answerInput {
+            width: 100%;
+            padding: 15px 20px;
+            font-size: clamp(1.1em, 4vw, 1.6em);
+            font-family: 'Nunito', sans-serif;
+            border-radius: 12px;
+            border: 3px solid var(--primary-color);
+            box-sizing: border-box;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        #answerInput:focus {
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(236, 64, 122, 0.3);
+        }
+        #answerInput.correct {
+            border-color: var(--success-color);
+            background-color: #e8f5e9;
+        }
+        #answerInput.incorrect {
+            border-color: var(--error-color);
+            animation: shake 0.5s;
+        }
+        #hint {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 12px;
+            font-size: clamp(1.1em, 4vw, 1.6em);
+            font-weight: 600;
+            pointer-events: none;
+            z-index: 10;
+            width: max-content;
+            max-width: 90%;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
+        }
+        .buttons {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        button {
+            background: var(--primary-color);
+            color: var(--white-color);
+            border: none;
+            padding: 12px 28px;
+            border-radius: 12px;
+            font-size: clamp(0.9em, 3.5vw, 1.1em);
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            touch-action: manipulation;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        button:hover, button:focus {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+            outline: none;
+        }
+        button#resetBtn { background-color: #757575; }
+        button#resetBtn:hover { background-color: #616161; }
+        button#checkBtn { background-color: var(--success-color); }
+        button#checkBtn:hover { background: #388e3c; }
+        button#hintBtn { background-color: var(--yellow-color); color: var(--text-color); }
+        button#hintBtn:hover { background-color: #ffb300; }
+        button:disabled {
+            background: #bdbdbd;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        .score {
+            font-size: clamp(1.1em, 4vw, 1.4em);
+            margin-top: 20px;
+            font-weight: 600;
+            color: var(--primary-dark);
+        }
+        .message {
+            font-size: clamp(1.1em, 4vw, 1.4em);
+            color: var(--error-color);
+            margin: 15px 0;
+            font-weight: 700;
+            min-height: 25px;
+        }
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1000;
+        }
+        .start-screen, .topic-selection-screen, .topic-congrats-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+        #startBtn, .topic-btn, .congrats-btn {
+            padding: 15px 40px;
+            font-size: 1.2em;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 450px;
+        }
+        #startBtn { background-color: var(--success-color); }
+        #startBtn:hover { background: #388e3c; }
+        .topic-btn-color-1 { background-color: var(--topic-color-1); }
+        .topic-btn-color-1:hover { background-color: #d32f2f; }
+        .topic-btn-color-2 { background-color: var(--topic-color-2); }
+        .topic-btn-color-2:hover { background-color: #1976d2; }
+        .topic-btn-color-3 { background-color: var(--topic-color-3); }
+        .topic-btn-color-3:hover { background-color: #388e3c; }
+        .topic-btn-color-4 { background-color: var(--topic-color-4); }
+        .topic-btn-color-4:hover { background-color: #f57c00; }
+        .topic-btn-color-5 { background-color: var(--topic-color-5); }
+        .topic-btn-color-5:hover { background-color: #8e24aa; }
+        #playerNameInput {
+            font-family: 'Nunito', sans-serif;
+            font-size: 1.2em;
+            padding: 10px 15px;
+            border-radius: 12px;
+            border: 2px solid var(--primary-color);
+            text-align: center;
+            width: 80%;
+            max-width: 300px;
+        }
+        #playerNameInput:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(236, 64, 122, 0.3);
+        }
+        @media (max-width: 600px) {
+            .container { padding: 15px; }
+            button { padding: 10px 20px; }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="fireworks"></canvas>
+    <div class="container">
+        <div class="game-title">NGHE VÀ VIẾT CHÍNH TẢ</div>
+        <div class="game-subtitle" id="gameSubtitle">(Dictation Practice)</div>
+        
+        <div class="start-screen" id="startScreen">
+            <input type="text" id="playerNameInput" placeholder="Nhập tên của bạn...">
+            <button id="startBtn">Bắt đầu</button>
+        </div>
+
+        <div class="topic-selection-screen" id="topicSelectionScreen" style="display: none;">
+            <!-- Topic buttons will be generated here -->
+        </div>
+
+        <div class="game-screen" id="gameScreen" style="display: none;">
+            <div class="meaning" id="meaning"></div>
+            <div class="input-container">
+                <input type="text" id="answerInput" placeholder="Nhập câu bạn nghe được..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+                <div id="hint"></div>
+            </div>
+            <div class="message" id="message"></div>
+            <div class="buttons">
+                <button id="listenAgainBtn">Nghe lại</button>
+                <button id="checkBtn">Kiểm tra</button>
+                <button id="hintBtn">Gợi ý</button>
+                <button id="resetBtn">Chủ đề khác</button>
+            </div>
+            <div class="score" id="score"></div>
+        </div>
+
+        <div class="topic-congrats-screen" id="topicCongratsScreen" style="display: none;">
+            <div class="message" id="congratsMessage" style="color: var(--success-color); font-size: 1.5em;"></div>
+            <button class="congrats-btn" id="playTopicAgainBtn">Chơi lại chủ đề này</button>
+            <button class="congrats-btn" id="chooseAnotherTopicBtn">Chọn chủ đề khác</button>
+        </div>
+    </div>
+
+    <script>
+    const topics = {
+        "I like...": [
+            { en: "I like apples.", vi: "Tôi thích táo.", emoji: "🍎" },
+            { en: "I like bananas.", vi: "Tôi thích chuối.", emoji: "🍌" },
+            { en: "I like milk.", vi: "Tôi thích sữa.", emoji: "🥛" },
+            { en: "I like cats.", vi: "Tôi thích mèo.", emoji: "🐈" },
+            { en: "I like dogs.", vi: "Tôi thích chó.", emoji: "🐕" },
+            { en: "I like my school.", vi: "Tôi thích trường của tôi.", emoji: "🏫" },
+            { en: "I like my teacher.", vi: "Tôi quý cô giáo của tôi.", emoji: "👩‍🏫" },
+            { en: "I like my friends.", vi: "Tôi quý bạn bè của tôi.", emoji: "🧑‍🤝‍🧑" },
+            { en: "I like music.", vi: "Tôi thích âm nhạc.", emoji: "🎵" },
+            { en: "I like books.", vi: "Tôi thích sách.", emoji: "📚" },
+        ],
+        "I can...": [
+            { en: "I can run.", vi: "Tôi có thể chạy.", emoji: "🏃" },
+            { en: "I can jump.", vi: "Tôi có thể nhảy.", emoji: "🤸" },
+            { en: "I can swim.", vi: "Tôi có thể bơi.", emoji: "🏊" },
+            { en: "I can draw.", vi: "Tôi có thể vẽ.", emoji: "🎨" },
+            { en: "I can sing.", vi: "Tôi có thể hát.", emoji: "🎤" },
+            { en: "I can dance.", vi: "Tôi có thể nhảy.", emoji: "💃" },
+            { en: "I can read.", vi: "Tôi có thể đọc.", emoji: "📖" },
+            { en: "I can write.", vi: "Tôi có thể viết.", emoji: "✍️" },
+            { en: "I can ride a bike.", vi: "Tôi có thể đi xe đạp.", emoji: "🚲" },
+            { en: "I can play football.", vi: "Tôi có thể chơi bóng đá.", emoji: "⚽" },
+        ],
+        "This is / That is...": [
+            { en: "This is my bag.", vi: "Đây là cặp của tôi.", emoji: "🎒" },
+            { en: "This is my book.", vi: "Đây là sách của tôi.", emoji: "📖" },
+            { en: "This is my pen.", vi: "Đây là bút của tôi.", emoji: "🖊️" },
+            { en: "This is my chair.", vi: "Đây là ghế của tôi.", emoji: "🪑" },
+            { en: "This is my hat.", vi: "Đây là mũ của tôi.", emoji: "👒" },
+            { en: "That is my house.", vi: "Kia là nhà của tôi.", emoji: "🏠" },
+            { en: "That is my school.", vi: "Kia là trường của tôi.", emoji: "🏫" },
+            { en: "That is my mom.", vi: "Kia là mẹ của tôi.", emoji: "👩‍👧" },
+            { en: "That is my dad.", vi: "Kia là bố của tôi.", emoji: "👨‍👧" },
+            { en: "That is my toy.", vi: "Kia là đồ chơi của tôi.", emoji: "🧸" },
+        ],
+        "I have...": [
+            { en: "I have a cat.", vi: "Tôi có một con mèo.", emoji: "🐈" },
+            { en: "I have a dog.", vi: "Tôi có một con chó.", emoji: "🐕" },
+            { en: "I have a ball.", vi: "Tôi có một quả bóng.", emoji: "⚽" },
+            { en: "I have a kite.", vi: "Tôi có một con diều.", emoji: "🪁" },
+            { en: "I have a bike.", vi: "Tôi có một chiếc xe đạp.", emoji: "🚲" },
+            { en: "I have a doll.", vi: "Tôi có một con búp bê.", emoji: "🎎" },
+            { en: "I have a red bag.", vi: "Tôi có một chiếc cặp màu đỏ.", emoji: "🎒" },
+            { en: "I have two pencils.", vi: "Tôi có hai cây bút chì.", emoji: "✏️" },
+            { en: "I have three books.", vi: "Tôi có ba quyển sách.", emoji: "📚" },
+            { en: "I have ten pencils.", vi: "Tôi có mười cây bút chì.", emoji: "✏️" },
+        ],
+        "This is... (Mới)": [
+            { en: "This is an alligator.", vi: "Đây là một con cá sấu.", emoji: "🐊" },
+            { en: "This is an ant.", vi: "Đây là một con kiến.", emoji: "🐜" },
+            { en: "This is an apple.", vi: "Đây là một quả táo.", emoji: "🍎" },
+            { en: "This is a ball.", vi: "Đây là một quả bóng.", emoji: "⚽" },
+            { en: "This is a banana.", vi: "Đây là một quả chuối.", emoji: "🍌" },
+            { en: "This is a bear.", vi: "Đây là một con gấu.", emoji: "🐻" },
+            { en: "This is a car.", vi: "Đây là một chiếc xe hơi.", emoji: "🚗" },
+            { en: "This is a cat.", vi: "Đây là một con mèo.", emoji: "🐈" },
+            { en: "This is a cow.", vi: "Đây là một con bò.", emoji: "🐄" },
+            { en: "This is a dog.", vi: "Đây là một con chó.", emoji: "🐕" },
+            { en: "This is a drum.", vi: "Đây là một cái trống.", emoji: "🥁" },
+            { en: "This is a duck.", vi: "Đây là một con vịt.", emoji: "🦆" },
+            { en: "This is an ear.", vi: "Đây là một cái tai.", emoji: "👂" },
+            { en: "This is an egg.", vi: "Đây là một quả trứng.", emoji: "🥚" },
+            { en: "This is an elephant.", vi: "Đây là một con voi.", emoji: "🐘" },
+            { en: "This is a fish.", vi: "Đây là một con cá.", emoji: "🐟" },
+            { en: "This is a frog.", vi: "Đây là một con ếch.", emoji: "🐸" },
+            { en: "This is a gift.", vi: "Đây là một món quà.", emoji: "🎁" },
+            { en: "This is a goat.", vi: "Đây là một con dê.", emoji: "🐐" },
+            { en: "This is a bunch of grapes.", vi: "Đây là một chùm nho.", emoji: "🍇" },
+            { en: "This is a hat.", vi: "Đây là một cái mũ.", emoji: "🎩" },
+            { en: "This is a horse.", vi: "Đây là một con ngựa.", emoji: "🐎" },
+            { en: "This is a house.", vi: "Đây là một ngôi nhà.", emoji: "🏠" },
+            { en: "This is an ice cream.", vi: "Đây là một cây kem.", emoji: "🍦" },
+            { en: "This is an insect.", vi: "Đây là một con côn trùng.", emoji: "🐛" },
+            { en: "This is a kangaroo.", vi: "Đây là một con kangaroo.", emoji: "🦘" },
+            { en: "This is a key.", vi: "Đây là một cái chìa khóa.", emoji: "🔑" },
+            { en: "This is a kite.", vi: "Đây là một con diều.", emoji: "🪁" },
+            { en: "This is a leaf.", vi: "Đây là một cái lá.", emoji: "🍃" },
+            { en: "This is a lion.", vi: "Đây là một con sư tử.", emoji: "🦁" },
+            { en: "This is some milk.", vi: "Đây là một ít sữa.", emoji: "🥛" },
+            { en: "This is the moon.", vi: "Đây là mặt trăng.", emoji: "🌕" },
+            { en: "This is a monkey.", vi: "Đây là một con khỉ.", emoji: "🐒" },
+            { en: "This is a net.", vi: "Đây là một cái lưới.", emoji: "🕸️" },
+            { en: "This is a nose.", vi: "Đây là một cái mũi.", emoji: "👃" },
+            { en: "This is an octopus.", vi: "Đây là một con bạch tuộc.", emoji: "🐙" },
+            { en: "This is an orange.", vi: "Đây là một quả cam.", emoji: "🍊" },
+            { en: "This is an owl.", vi: "Đây là một con cú.", emoji: "🦉" },
+            { en: "This is a pen.", vi: "Đây là một cây bút.", emoji: "🖊️" },
+            { en: "This is a pig.", vi: "Đây là một con heo.", emoji: "🐷" },
+            { en: "This is a pizza.", vi: "Đây là một cái bánh pizza.", emoji: "🍕" },
+            { en: "This is a rabbit.", vi: "Đây là một con thỏ.", emoji: "🐇" },
+            { en: "This is a robot.", vi: "Đây là một con robot.", emoji: "🤖" },
+            { en: "This is a sock.", vi: "Đây là một chiếc tất.", emoji: "🧦" },
+            { en: "This is a star.", vi: "Đây là một ngôi sao.", emoji: "⭐" },
+            { en: "This is the sun.", vi: "Đây là mặt trời.", emoji: "☀️" },
+            { en: "This is a tiger.", vi: "Đây là một con hổ.", emoji: "🐅" },
+            { en: "This is a turtle.", vi: "Đây là một con rùa.", emoji: "🐢" },
+            { en: "This is an umbrella.", vi: "Đây là một cái ô.", emoji: "☂️" },
+            { en: "This is a unicorn.", vi: "Đây là một con kỳ lân.", emoji: "🦄" },
+            { en: "This is a uniform.", vi: "Đây là một bộ đồng phục.", emoji: "👕" },
+            { en: "This is a van.", vi: "Đây là một chiếc xe van.", emoji: "🚐" },
+            { en: "This is a violin.", vi: "Đây là một cây đàn violin.", emoji: "🎻" },
+            { en: "This is a watch.", vi: "Đây là một chiếc đồng hồ.", emoji: "⌚" },
+            { en: "This is a whale.", vi: "Đây là một con cá voi.", emoji: "🐋" },
+            { en: "This is a yo-yo.", vi: "Đây là một cái yo-yo.", emoji: "🪀" },
+            { en: "This is a zebra.", vi: "Đây là một con ngựa vằn.", emoji: "🦓" }
+        ]
+    };
+
+    const elements = {
+        startScreen: document.getElementById('startScreen'),
+        gameScreen: document.getElementById('gameScreen'),
+        topicSelectionScreen: document.getElementById('topicSelectionScreen'),
+        topicCongratsScreen: document.getElementById('topicCongratsScreen'),
+        meaning: document.getElementById('meaning'),
+        message: document.getElementById('message'),
+        listenAgainBtn: document.getElementById('listenAgainBtn'),
+        resetBtn: document.getElementById('resetBtn'),
+        startBtn: document.getElementById('startBtn'),
+        playTopicAgainBtn: document.getElementById('playTopicAgainBtn'),
+        chooseAnotherTopicBtn: document.getElementById('chooseAnotherTopicBtn'),
+        score: document.getElementById('score'),
+        canvas: document.getElementById('fireworks'),
+        playerNameInput: document.getElementById('playerNameInput'),
+        congratsMessage: document.getElementById('congratsMessage'),
+        gameSubtitle: document.getElementById('gameSubtitle'),
+        answerInput: document.getElementById('answerInput'),
+        checkBtn: document.getElementById('checkBtn'),
+        hintBtn: document.getElementById('hintBtn'),
+        hint: document.getElementById('hint'),
+    };
+
+    let state = {};
+    const isSpeechSupported = 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window;
+
+    function initializeState() {
+        state = {
+            playerName: state.playerName || '',
+            currentTopic: null,
+            currentSentences: [],
+            originalSentence: '',
+            score: 0,
+            completedSentences: 0,
+            correctlyAnsweredCount: 0,
+            currentSentenceIndex: 0,
+            isSpeaking: false,
+            animationFrameId: null,
+            speechTimeoutId: null,
+            audioIntervalId: null,
+            mistakeCount: 0,
+            nextSentenceTimeoutId: null
+        };
+    }
+
+    function initializeSpeech() {
+        if (isSpeechSupported && speechSynthesis.getVoices().length === 0) {
+            speechSynthesis.onvoiceschanged = () => console.log("Voices loaded.");
+        }
+    }
+
+    function speak(text, options = {}) {
+        const callback = typeof options === 'function' ? options : options.callback;
+        const rate = options.rate || 1.0;
+
+        if (!isSpeechSupported) { if (callback) callback(); return; }
+        
+        // Stop any currently playing audio loop or pending speech
+        stopAudioLoop(false); // Pass false to not cancel current speech if not needed
+
+        if (speechSynthesis.speaking) {
+            speechSynthesis.cancel();
+        }
+
+        state.isSpeaking = true;
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'en-US';
+        utterance.rate = rate;
+
+        utterance.onend = () => {
+            state.isSpeaking = false;
+            state.speechTimeoutId = null;
+            if (callback) callback();
+        };
+
+        utterance.onerror = (event) => {
+            if (event.error !== 'interrupted') console.error('SpeechSynthesis Error:', event.error);
+            state.isSpeaking = false;
+            state.speechTimeoutId = null;
+            if (callback) callback();
+        };
+
+        state.speechTimeoutId = setTimeout(() => {
+            speechSynthesis.speak(utterance);
+        }, 100);
+    }
+    
+    function updateScoreDisplay() {
+        elements.score.textContent = `Điểm: ${state.score} | Hoàn thành: ${state.completedSentences}/${state.currentSentences.length}`;
+    }
+
+    function startAudioLoop() {
+        stopAudioLoop();
+        speak(state.originalSentence, { rate: 0.9 });
+        state.audioIntervalId = setInterval(() => {
+            speak(state.originalSentence, { rate: 0.9 });
+        }, 5000);
+    }
+
+    function stopAudioLoop(cancelSpeech = true) {
+        if (state.audioIntervalId) clearInterval(state.audioIntervalId);
+        if (state.speechTimeoutId) clearTimeout(state.speechTimeoutId);
+        if (state.nextSentenceTimeoutId) clearTimeout(state.nextSentenceTimeoutId);
+        state.audioIntervalId = null;
+        state.speechTimeoutId = null;
+        state.nextSentenceTimeoutId = null;
+        if (cancelSpeech && isSpeechSupported && speechSynthesis.speaking) {
+            speechSynthesis.cancel();
+        }
+    }
+
+    function startNewSentence() {
+        if (state.completedSentences >= state.currentSentences.length) {
+            showTopicCongratulations();
+            return;
+        }
+        const currentData = state.currentSentences[state.currentSentenceIndex];
+        state.originalSentence = currentData.en;
+        state.mistakeCount = 0;
+
+        elements.meaning.innerHTML = `<span>&ldquo;${currentData.vi}&rdquo;</span><span>${currentData.emoji}</span>`;
+        elements.message.textContent = '';
+        elements.message.style.color = 'var(--error-color)';
+        
+        const input = elements.answerInput;
+        input.value = '';
+        input.disabled = false;
+        input.classList.remove('correct', 'incorrect');
+        input.focus();
+        
+        elements.checkBtn.disabled = false;
+        elements.listenAgainBtn.disabled = false;
+        elements.hintBtn.disabled = false;
+        
+        updateScoreDisplay();
+        startAudioLoop();
+    }
+
+    function handleCheckAnswer() {
+        if(elements.checkBtn.disabled) return;
+
+        const userAnswer = elements.answerInput.value.trim();
+        const correctAnswer = state.originalSentence;
+
+        if (userAnswer === correctAnswer) {
+            elements.answerInput.classList.remove('incorrect');
+            elements.answerInput.classList.add('correct');
+            elements.answerInput.disabled = true;
+            elements.checkBtn.disabled = true;
+            elements.hintBtn.disabled = true;
+            stopAudioLoop();
+
+            if (state.mistakeCount < 3) {
+                state.score += 10;
+                state.correctlyAnsweredCount++;
+                elements.message.textContent = 'Chính xác! +10 điểm.';
+                elements.message.style.color = 'var(--success-color)';
+            }
+            
+            state.completedSentences++;
+            state.currentSentenceIndex++;
+            updateScoreDisplay();
+            
+            speak(correctAnswer, () => {
+                state.nextSentenceTimeoutId = setTimeout(startNewSentence, 2000);
+            });
+
+        } else {
+            state.mistakeCount++;
+            elements.answerInput.classList.add('incorrect');
+            setTimeout(() => {
+                elements.answerInput.classList.remove('incorrect');
+            }, 500);
+
+            if (state.mistakeCount >= 3) {
+                elements.answerInput.disabled = true;
+                elements.checkBtn.disabled = true;
+                elements.hintBtn.disabled = true;
+                stopAudioLoop();
+
+                elements.message.textContent = `Bạn đã sai 3 lần. Đáp án đúng: "${correctAnswer}"`;
+                
+                state.completedSentences++;
+                state.currentSentenceIndex++;
+                updateScoreDisplay();
+
+                state.nextSentenceTimeoutId = setTimeout(startNewSentence, 3500);
+            } else {
+                elements.message.textContent = `Sai rồi! (Số lần sai: ${state.mistakeCount}/3)`;
+            }
+        }
+    }
+
+    function showTopicCongratulations() {
+        elements.gameScreen.style.display = 'none';
+        elements.topicCongratsScreen.style.display = 'flex';
+        elements.congratsMessage.innerHTML = `Chúc mừng <strong>${state.playerName}</strong>!<br>Bạn đã đạt ${state.score} điểm, hoàn thành đúng ${state.correctlyAnsweredCount}/${state.currentSentences.length} câu trong chủ đề "${state.currentTopic}".`;
+        startFireworks();
+    }
+
+    function showTopicSelection() {
+        stopAudioLoop();
+        stopFireworks();
+        elements.gameScreen.style.display = 'none';
+        elements.topicCongratsScreen.style.display = 'none';
+        elements.startScreen.style.display = 'none';
+        elements.topicSelectionScreen.style.display = 'flex';
+        elements.gameSubtitle.textContent = "(Dictation Practice)";
+    }
+
+    function startGame(topic) {
+        initializeState();
+        state.currentTopic = topic;
+        state.currentSentences = [...topics[topic]]; // Create a copy
+        
+        elements.gameSubtitle.textContent = `Chủ đề: ${topic}`;
+        elements.topicSelectionScreen.style.display = 'none';
+        elements.gameScreen.style.display = 'block';
+        startNewSentence();
+    }
+
+    function createTopicButtons() {
+        const topicContainer = elements.topicSelectionScreen;
+        topicContainer.innerHTML = ''; // Clear existing buttons
+        let colorIndex = 1;
+        for (const topic in topics) {
+            const button = document.createElement('button');
+            button.className = `topic-btn topic-btn-color-${colorIndex}`;
+            button.textContent = topic;
+            button.onclick = () => startGame(topic);
+            topicContainer.appendChild(button);
+            colorIndex = (colorIndex % 5) + 1;
+        }
+    }
+
+    function setupEventListeners() {
+        elements.startBtn.addEventListener('click', () => {
+            const playerName = elements.playerNameInput.value.trim();
+            if (playerName) {
+                state.playerName = playerName;
+                elements.startScreen.style.display = 'none';
+                elements.topicSelectionScreen.style.display = 'flex';
+            } else {
+                alert("Vui lòng nhập tên của bạn!");
+            }
+        });
+
+        elements.listenAgainBtn.addEventListener('click', () => {
+            if (!state.isSpeaking) {
+                speak(state.originalSentence);
+            }
+        });
+        
+        elements.resetBtn.addEventListener('click', showTopicSelection);
+
+        elements.playTopicAgainBtn.addEventListener('click', () => {
+            stopFireworks();
+            elements.topicCongratsScreen.style.display = 'none';
+            startGame(state.currentTopic);
+        });
+        
+        elements.chooseAnotherTopicBtn.addEventListener('click', showTopicSelection);
+
+        // New Listeners for Dictation Game
+        elements.checkBtn.addEventListener('click', handleCheckAnswer);
+        elements.answerInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !elements.checkBtn.disabled) {
+                handleCheckAnswer();
+            }
+        });
+
+        const showHint = () => {
+            elements.hint.textContent = state.originalSentence;
+            elements.hint.style.display = 'block';
+        };
+        const hideHint = () => {
+            elements.hint.style.display = 'none';
+        };
+
+        elements.hintBtn.addEventListener('mousedown', showHint);
+        elements.hintBtn.addEventListener('mouseup', hideHint);
+        elements.hintBtn.addEventListener('mouseleave', hideHint);
+        elements.hintBtn.addEventListener('touchstart', (e) => { e.preventDefault(); showHint(); });
+        elements.hintBtn.addEventListener('touchend', hideHint);
+    }
+    
+    // --- Fireworks Animation ---
+    let fireworksRunning = false;
+    function startFireworks() {
+        if (fireworksRunning) return;
+        fireworksRunning = true;
+        const ctx = elements.canvas.getContext('2d');
+        const fireworks = [];
+        const particles = [];
+        let hue = 120;
+
+        function setCanvasSize() {
+            elements.canvas.width = window.innerWidth;
+            elements.canvas.height = window.innerHeight;
+        }
+
+        function random(min, max) { return Math.random() * (max - min) + min; }
+        
+        function Firework(sx, sy, tx, ty) { /* ... Firework logic ... */ }
+        Firework.prototype.update = function(index) { /* ... */ };
+        Firework.prototype.draw = function() { /* ... */ };
+        function Particle(x, y, hue) { /* ... Particle logic ... */ }
+        Particle.prototype.update = function(index) { /* ... */ };
+        Particle.prototype.draw = function(ctx) { /* ... */ };
+        function createParticles(x, y, hue) { /* ... */ }
+
+        // Simplified implementation for brevity
+        setCanvasSize();
+        window.addEventListener('resize', setCanvasSize);
+        function loop() {
+            if (!fireworksRunning) {
+                ctx.clearRect(0, 0, elements.canvas.width, elements.canvas.height);
+                return;
+            }
+            requestAnimationFrame(loop);
+            hue += 0.5;
+            ctx.globalCompositeOperation = 'destination-out';
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+            ctx.fillRect(0, 0, elements.canvas.width, elements.canvas.height);
+            ctx.globalCompositeOperation = 'lighter';
+
+            if (Math.random() < 0.05) {
+                fireworks.push(new Firework(random(0, elements.canvas.width), elements.canvas.height, random(0, elements.canvas.width), random(0, elements.canvas.height / 2)));
+            }
+            fireworks.forEach((f, i) => { f.update(i); f.draw(); });
+            particles.forEach((p, i) => { p.update(i); p.draw(ctx); });
+        }
+
+        // Re-implementing simplified logic to avoid placeholder comments
+        Firework.prototype.update = function(index) {
+            this.x += this.vx; this.y += this.vy;
+            if (Math.sqrt(Math.pow(this.tx - this.x, 2) + Math.pow(this.ty - this.y, 2)) <= this.speed) {
+                createParticles(this.tx, this.ty, this.hue);
+                fireworks.splice(index, 1);
+            }
+        };
+        Firework.prototype.draw = function() {
+             ctx.beginPath(); ctx.moveTo(this.x, this.y);
+             ctx.lineTo(this.x - this.vx * 3, this.y - this.vy * 3);
+             ctx.strokeStyle = `hsl(${this.hue}, 100%, 50%)`; ctx.stroke();
+        };
+        Particle.prototype.update = function(index) {
+            this.x += this.vx; this.y += this.vy; this.alpha -= 0.01;
+            if (this.alpha <= 0) particles.splice(index, 1);
+        };
+        Particle.prototype.draw = function(ctx) {
+            ctx.save(); ctx.globalAlpha = this.alpha;
+            ctx.beginPath(); ctx.arc(this.x, this.y, 1.5, 0, Math.PI * 2, false);
+            ctx.fillStyle = `hsl(${this.hue}, 100%, 50%)`; ctx.fill();
+            ctx.restore();
+        };
+        function createParticles(x, y, hue) { for (let i = 0; i < 30; i++) particles.push(new Particle(x, y, hue)); }
+        function Firework(sx, sy, tx, ty) {
+            this.x = sx; this.y = sy; this.sx = sx; this.sy = sy;
+            this.tx = tx; this.ty = ty;
+            const angle = Math.atan2(ty - sy, tx - sx); this.speed = 2;
+            this.vx = Math.cos(angle) * this.speed; this.vy = Math.sin(angle) * this.speed;
+            this.hue = hue;
+        }
+        function Particle(x, y, hue) {
+            this.x = x; this.y = y; this.angle = random(0, Math.PI * 2);
+            this.speed = random(1, 5);
+            this.vx = Math.cos(this.angle) * this.speed;
+            this.vy = Math.sin(this.angle) * this.speed;
+            this.hue = hue; this.alpha = 1;
+        }
+
+        loop();
+    }
+
+    function stopFireworks() {
+        fireworksRunning = false;
+    }
+
+    // --- Initial Load ---
+    window.onload = () => {
+        initializeState();
+        initializeSpeech();
+        createTopicButtons();
+        setupEventListeners();
+    };
+    </script>
+</body>
+</html>
+
